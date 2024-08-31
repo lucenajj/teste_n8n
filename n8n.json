@@ -1,0 +1,59 @@
+{
+    "name": "Meta Campaign Data",
+    "description": "Extract campaign data from Meta API and process it within N8N",
+    "nodes": [
+        {
+            "name": "Meta API",
+            "type": "n8n-nodes-base.http",
+            "typeVersion": 1,
+            "helpers": {},
+            "properties": {
+                "method": "GET",
+                "uri": "https://api.meta.com/v1/campaigns",
+                "headers": {
+                    "Authorization": "Bearer {{metaApiKey}}"
+                },
+                "json": true
+            }
+        },
+        {
+            "name": "Parse JSON",
+            "type": "n8n-nodes-base.json",
+            "typeVersion": 1,
+            "helpers": {},
+            "properties": {
+                "json": {
+                    "type": "json",
+                    "properties": {
+                        "json": {
+                            "field": "json.data"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "Send Email",
+            "type": "n8n-nodes-base.email",
+            "typeVersion": 1,
+            "helpers": {},
+            "properties": {
+                "host": "smtp.example.com",
+                "port": 587,
+                "sender": "n8n-prodigy@example.com",
+                "auth": {
+                    "user": "n8n-prodigy",
+                    "pass": "password"
+                },
+                "to": "cirei@example.com",
+                "subject": "Meta Campaign Data",
+                "body": {
+                    "type": "template",
+                    "properties": {
+                        "template": "Campaign data extracted from Meta API: \n\n{{$json|join('\n')}}"
+                    }
+                }
+            }
+        }
+    ]
+}
